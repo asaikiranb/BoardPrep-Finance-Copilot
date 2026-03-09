@@ -89,9 +89,8 @@ def render_message(msg):
     if msg["role"] == "user":
         st.markdown(f"<div class='user-message'>{msg['content']}</div>", unsafe_allow_html=True)
     else:
-        st.markdown("<div class='bot-message'>", unsafe_allow_html=True)
         if msg["type"] == "text":
-            st.markdown(msg["content"])
+            st.markdown(f"<div class='bot-message'>{msg['content']}</div>", unsafe_allow_html=True)
         elif msg["type"] == "analysis":
             # 1. SQL Block
             st.markdown("##### Approved Query")
@@ -115,8 +114,6 @@ def render_message(msg):
             
             # 3. Narrative & Governance
             st.markdown(f"<div class='narrative-block'>{msg['narrative']}</div>", unsafe_allow_html=True)
-            
-        st.markdown("</div>", unsafe_allow_html=True)
 
 for msg in st.session_state.messages:
     render_message(msg)
