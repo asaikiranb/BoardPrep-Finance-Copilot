@@ -1,0 +1,46 @@
+# BoardPrep AI: Governed Finance Semantic Layer Configuration
+# This file mathematically dictates how the Text-to-SQL logic resolves business metrics, preventing hallucinations.
+
+version: 1.0
+
+models:
+  - name: dim_customer
+    description: Master customer file with segment and acquisition cohort mapping.
+  - name: dim_date
+    description: Standard calendar for financial periods.
+  - name: fct_revenue
+    description: Source of truth for all recurring and one-time revenue.
+  - name: fct_support_cost
+    description: Event-level log of AI usage, workflow escalations, and human exception costs.
+
+metrics:
+  - name: Annual Recurring Revenue (ARR)
+    description: Annualized value of all recurring revenue. Excludes one-time implementation fees.
+    calculation: "SUM(fct_revenue.mrr) * 12"
+    format: "currency"
+    approved_joins: ["dim_customer", "dim_date"]
+
+  - name: Net Revenue Retention (NRR)
+    description: Metric tracking expansion vs contraction from existing customers.
+    calculation: "(SUM(mrr) + SUM(expansion_mrr) + SUM(contraction_mrr)) / NULLIF(SUM(mrr), 0)"
+    format: "percent"
+
+  - name: Cost to Serve (Support Escalations)
+    description: Total human labor cost explicitly associated with workflow exceptions.
+    calculation: "SUM(fct_support_cost.support_cost_usd)"
+    format: "currency"
+
+  - name: Exception Volume
+    description: Number of total human escalated events.
+    calculation: "SUM(fct_support_cost.human_escalations)"
+    format: "number"
+
+  - name: Budget Variance (Support Cost)
+    description: Amount that actual support cost exceeded or stayed under budget. Positive means over budget (bad).
+    calculation: "SUM(fct_budget_vs_actual.actual_support_cost) - SUM(fct_budget_vs_actual.budget_support_cost)"
+    format: "currency"
+
+guardrails:
+  - constraint: "Always CAST date aggregations to YYYY-MM explicitly using dim_date.month"
+  - constraint: "Do not average mrr across completely different cohorts without weighting by customer_id."
+  - constraint: "When filtering by 'Vertical', always use dim_customer.vertical."
