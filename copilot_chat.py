@@ -118,9 +118,6 @@ def render_message(msg):
             
         st.markdown("</div>", unsafe_allow_html=True)
 
-# Layout container
-st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
-
 for msg in st.session_state.messages:
     render_message(msg)
 
@@ -132,8 +129,6 @@ if len(st.session_state.messages) == 1:
     c2.button("Which enterprise housing accounts had the highest expansion revenue last quarter but are also trending above average on support cost?", key="p2", on_click=lambda: st.session_state.update(prompt="Which enterprise housing accounts had the highest expansion revenue last quarter but are also trending above average on support cost?"))
     c1.button("What was net new ARR from healthcare customers this quarter?", key="p3", on_click=lambda: st.session_state.update(prompt="What was net new ARR from healthcare customers this quarter?"))
     c2.button("Show cohorts signed in the last 12 months and their 90-day expansion performance.", key="p4", on_click=lambda: st.session_state.update(prompt="Show cohorts signed in the last 12 months and their 90-day expansion performance."))
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 # Chat Input
 user_input = st.chat_input("Ask a finance question...")
